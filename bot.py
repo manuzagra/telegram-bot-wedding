@@ -138,15 +138,9 @@ if __name__ == '__main__':
 
     TOKEN = '6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y'
 
-    persistence = PicklePersistence(filepath='./persistent_data/bot_data.pkl')
+    persistence = PicklePersistence(filepath='/workspaces/get_the_password_bot/persistent_data/bot_data.pkl')
     application = ApplicationBuilder().token(TOKEN).persistence(persistence).build()
 
     application.add_handler(get_state_machine())
 
-    PORT = int(os.environ.get('PORT', '8443'))
-    application.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        secret_token=TOKEN,
-        webhook_url="https://telegram-bot-wedding.herokuapp.com/" + TOKEN
-    )
+    application.run_polling()
