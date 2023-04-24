@@ -136,7 +136,7 @@ def get_state_machine():
 
 if __name__ == '__main__':
 
-    TOKEN = '0000000000000000'
+    TOKEN = '6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y'
 
     persistence = PicklePersistence(filepath='./persistent_data/bot_data.pkl')
     application = ApplicationBuilder().token(TOKEN).persistence(persistence).build()
