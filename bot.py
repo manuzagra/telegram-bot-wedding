@@ -1,3 +1,4 @@
+import os
 import logging
 from telegram import Update, InlineQueryResultArticle, InputTextMessageContent, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup
 from telegram.ext import ConversationHandler, filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes, InlineQueryHandler, PicklePersistence, CallbackQueryHandler
@@ -196,6 +197,7 @@ def get_state_machine():
 if __name__ == '__main__':
 
     TOKEN = '6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y'
+    PORT = int(os.environ.get('PORT', '8443'))
 
     persistence = PicklePersistence(filepath='/workspaces/get_the_password_bot/persistent_data/bot_data.pkl')
     application = ApplicationBuilder().token('6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y').persistence(persistence).build()
@@ -204,9 +206,8 @@ if __name__ == '__main__':
 
     # application.run_polling()
     application.run_webhook(
-        listen='0.0.0.0',
-        port=8443,
-        url_path=TOKEN,
+        listen="0.0.0.0",
+        port=PORT,
         secret_token=TOKEN,
-        webhook_url='https://telegram-bot-wedding.herokuapp.com/' + TOKEN
+        webhook_url="https://telegram-bot-wedding.herokuapp.com/"
     )
