@@ -202,4 +202,10 @@ if __name__ == '__main__':
 
     application.add_handler(get_state_machine())
 
-    application.run_polling()
+    # application.run_polling()
+    application.run_webhook(
+        listen='0.0.0.0',
+        port=8443,
+        secret_token=TOKEN,
+        webhook_url='https://telegram-bot-wedding.herokuapp.com/' + TOKEN
+    )
