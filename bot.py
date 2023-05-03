@@ -12,11 +12,11 @@ logger = logging.getLogger()
 
 
 # states
-MAIN_OPTIONS, INTRO_NUMBER_SAVE_NAME_REQ_NUMBER, INTRO_NUMBER_SAVE_NUMBER, GUESS_GAME_REQ_ORDER, GUESS_GAME_INTRO_NUMBER, END = range(6)
+MAIN_OPTIONS, INTRO_NUMBER_SAVE_NAME_REQ_NUMBER, INTRO_NUMBER_SAVE_NUMBER, GUESS_GAME_REQ_ORDER, GUESS_GAME_INTRO_NUMBER, ZYGU_READ_SOL, ZYGU_REPEAT, END = range(8)
 
 # participants
-PARTICIPANTS = ['Manuel', 'Alfonsito', 'Carlos Ropero', 'Xulo']
-
+PARTICIPANTS = ['Manuel', 'Alfonsito', 'Ander', 'Carlos Ropero', 'Catarro', 'Choco', 'Gabino', 'Efe', 'Loli', 'Luisfe', 'Pelu', 'Xulo', 'Zygus']
+#                m         a             n       c                  t         h       g          f     l         i       p       x       z
 # texts
 INTRO_NUMBERS = 'Introducir un número/letra que has conseguido'
 GUESS_GAME = 'Jugar para adivinar el orden'
@@ -29,7 +29,6 @@ async def init(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if context.user_data.get('new_interaction', True):
         if not context.user_data.get('numbers', False):
             context.user_data['numbers'] = {p: '-' for p in PARTICIPANTS}
-            context.user_data['numbers'] = {'Manuel': '1', 'Alfonsito': '2', 'Carlos Ropero': '3', 'Xulo': '4'}
         message = 'Bienvenido al juego de tu boda!!!\nPrimero tendrás que conseguir una serie de carácteres de los participantes en el juego, después tendrás que jugar a un juego para averiguar el orden.\n¿Qué quieres hacer?'
         context.user_data['new_interaction'] = False
     else:
@@ -85,19 +84,19 @@ async def guess_number_intro_number(update: Update, context: ContextTypes.DEFAUL
 
 async def guess_number_check_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
-    truth = '1234'
+    truth = 'nxzcpgfliamth'.upper()
 
     digits = ''.join(context.user_data['numbers'].values())
 
     for d in update.message.text:
-        if d not in digits:
+        if d.upper() not in digits:
             message = 'Hay uno o más carácteres incorrectos, por favor usa solo los carácteres que te ha dado la gente.\n¿Quieres intentarlo otra vez ( /si o /no)?'
 
             await update.message.reply_text(message)
 
             return GUESS_GAME_INTRO_NUMBER
 
-    easy_mode = False
+    easy_mode = True
 
     if easy_mode:
 
@@ -106,7 +105,7 @@ async def guess_number_check_number(update: Update, context: ContextTypes.DEFAUL
             message += 'o' if update.message.text[i].upper() == truth[i] else 'x'
 
         if 'x' in message:
-            message = str(update.message.text) + '\n' + message + '\n¿Quieres intentarlo otra vez ( /si o /no)?'
+            message = '\t'.join(str(update.message.text).upper()) + '\n' + '\t'.join(message.upper()) + '\n¿Quieres intentarlo otra vez ( /si o /no)?'
 
             await update.message.reply_text(message)
 
@@ -135,6 +134,25 @@ async def guess_number_check_number(update: Update, context: ContextTypes.DEFAUL
 
             return END
 
+async def zygu_intro_sol(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+
+    await update.message.reply_text(f'Si quieres la pieza de este puzzle tendrás que sumar los dígitos de  el valor entero de cada letra de la cuarta palabra en inglés.\nIntroduce la solución.')
+
+    return ZYGU_READ_SOL
+
+async def zygu_check_sol(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+
+    sol = '62'
+
+    if update.message.text == sol:
+        await update.message.reply_text('Correcto!!!\nEl carácter correspondiente al Zygu ha sido guardado.\nEscribe /menu para volver al menu principal o /salir para acabar el juego.')
+        context.user_data['numbers']['Zygus'] = 'Z'
+        return END
+    else:
+        await update.message.reply_text('No es correcto, para pistas molesta al Zigüeño.\n¿Quieres intentarlo otra vez ( /si o /no)?')
+
+        return ZYGU_REPEAT
+
 async def instructions(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     INSTRUCTIONS = 'Here you would see the instructions'
@@ -161,9 +179,11 @@ def get_state_machine():
                 MessageHandler(filters.Regex(f'^{INTRO_NUMBERS}'), intro_number_req_name),
                 MessageHandler(filters.Regex(f'^{GUESS_GAME}'), guess_number_intro_number)
             ],
-            INTRO_NUMBER_SAVE_NAME_REQ_NUMBER: [MessageHandler(filters.TEXT, intro_number_save_name_req_number)],
+            INTRO_NUMBER_SAVE_NAME_REQ_NUMBER: [MessageHandler(filters.Regex('Zygus'), zygu_intro_sol), MessageHandler(filters.TEXT, intro_number_save_name_req_number)],
             INTRO_NUMBER_SAVE_NUMBER: [MessageHandler(filters.TEXT, intro_number_save_number)],
-            GUESS_GAME_INTRO_NUMBER: [MessageHandler(filters.Regex(f'^No|no$'), init), MessageHandler(filters.TEXT & ~filters.Regex(f'^No|no$'), guess_number_intro_number)],
+            ZYGU_READ_SOL: [MessageHandler(filters.TEXT, zygu_check_sol)],
+            ZYGU_REPEAT: [MessageHandler(filters.Regex('^No|no$'), init), MessageHandler(filters.TEXT & ~filters.Regex('^No|no$'), zygu_intro_sol)],
+            GUESS_GAME_INTRO_NUMBER: [MessageHandler(filters.Regex('^No|no$'), init), MessageHandler(filters.TEXT & ~filters.Regex('^No|no$'), guess_number_intro_number)],
             GUESS_GAME_REQ_ORDER: [MessageHandler(filters.TEXT, guess_number_check_number)],
             END: [CommandHandler('menu', init), CommandHandler('salir', end), CommandHandler('instrucciones', instructions), MessageHandler(filters.TEXT, init)],
         },
