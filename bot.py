@@ -15,8 +15,8 @@ logger = logging.getLogger()
 MAIN_OPTIONS, INTRO_NUMBER_SAVE_NAME_REQ_NUMBER, INTRO_NUMBER_SAVE_NUMBER, GUESS_GAME_REQ_ORDER, GUESS_GAME_INTRO_NUMBER, ZYGU_READ_SOL, ZYGU_REPEAT, END = range(8)
 
 # participants
-PARTICIPANTS = ['Manuel', 'Alfonsito', 'Ander', 'Carlos Ropero', 'Catarro', 'Choco', 'Gabino', 'Efe', 'Loli', 'Luisfe', 'Pelu', 'Xulo', 'Zygus']
-#                m         a             n       c                  t         h       g          f     l         i       p       x       z
+PARTICIPANTS = ['Manuel', 'Alfonsito', 'Ander', 'Carlos Ropero', 'Catarro', 'Choco', 'Gabino', 'Efe', 'Loli', 'Luisfe', 'Pelu', 'Xulo', 'Zygus', 'Sarita']
+#                m         a             n       c                  t         h       g          f     l         i       p       x       z          r
 # texts
 INTRO_NUMBERS = 'Introducir un número/letra que has conseguido'
 GUESS_GAME = 'Jugar para adivinar el orden'
@@ -84,7 +84,7 @@ async def guess_number_intro_number(update: Update, context: ContextTypes.DEFAUL
 
 async def guess_number_check_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
-    truth = 'nxzcpgfliamth'.upper()
+    truth = 'nxzcpgflriamth'.upper()
 
     digits = ''.join(context.user_data['numbers'].values())
 
