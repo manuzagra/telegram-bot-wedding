@@ -97,7 +97,7 @@ async def guess_number_check_number(update: Update, context: ContextTypes.DEFAUL
 
             return GUESS_GAME_INTRO_NUMBER
 
-    easy_mode = True
+    easy_mode = False
 
     if easy_mode:
 
@@ -156,7 +156,7 @@ async def zygu_check_sol(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 async def instructions(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
-    INSTRUCTIONS = 'Here you would see the instructions'
+    INSTRUCTIONS = 'Por si acaso se me olvidaba....la contraseña de la caja es tu cumpleaños ja ja ja, 180191...'
 
     await update.message.reply_text(INSTRUCTIONS + '\n\nPara volver a comenzar escribe /start.')
 
@@ -204,10 +204,4 @@ if __name__ == '__main__':
 
     application.add_handler(get_state_machine())
 
-    # application.run_polling()
-    application.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        secret_token=TOKEN,
-        webhook_url="https://telegram-bot-wedding.herokuapp.com/"
-    )
+    application.run_polling()
