@@ -1,5 +1,6 @@
 import logging
 from telegram.ext import *
+from telegram import *
 import os
 
 
