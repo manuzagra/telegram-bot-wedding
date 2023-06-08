@@ -107,7 +107,6 @@ def main() -> None:
     application.run_webhook(
         listen="0.0.0.0",
         port=PORT,
-        secret_token=TOKEN,
         webhook_url="https://telegram-bot-wedding.herokuapp.com/"
     )
 
