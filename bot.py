@@ -57,7 +57,7 @@ def main():
         listen="0.0.0.0",
         port=int(PORT),
         url_path=TOKEN,
-        webhook_url='https://telegram-bot-wedding.herokuapp.com/' + TOKEN
+        webhook_url='https://telegram-bot-wedding.herokuapp.com/'
     )
 
 if __name__ == '__main__':
