@@ -1,64 +1,79 @@
-import logging
-from telegram.ext import *
-from telegram import *
 import os
+import logging
+from telegram import Update, InlineQueryResultArticle, InputTextMessageContent
+from telegram.ext import filters, MessageHandler, ApplicationBuilder, CommandHandler, ContextTypes, InlineQueryHandler, PicklePersistence
 
 
-
-
-
-# Enable logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-
-logger = logging.getLogger(__name__)
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.DEBUG
+)
 
 TOKEN = '6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y'
 PORT = int(os.environ.get('PORT', '8443'))
 
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
-def start(update, context):
-    """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['caps_number'] = 0
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
 
-def help(update, context):
-    """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=update.message.text)
 
-def echo(update, context):
-    """Echo the user message."""
-    update.message.reply_text(update.message.text)
+async def caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['caps_number'] += 1
+    text_caps = ' '.join(context.args).upper()
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=text_caps)
 
-def error(update, context):
-    """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+async def inline_caps(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.inline_query.query
+    if not query:
+        return
+    results = []
+    results.append(
+        InlineQueryResultArticle(
+            id=query.upper(),
+            title='Caps',
+            input_message_content=InputTextMessageContent(query.upper())
+        )
+    )
+    await context.bot.answer_inline_query(update.inline_query.id, results)
 
-def main():
-    """Start the bot."""
-    # Create the Updater and pass it your bot's token.
-    # Make sure to set use_context=True to use the new context based callbacks
-    # Post version 12 this will no longer be necessary
-    application = ApplicationBuilder().token('6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y').build()
+async def ncaps(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text=f"You used caps {context.user_data['caps_number']} times.")
 
-    # on different commands - answer in Telegram
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help))
+async def unknown(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(chat_id=update.effective_chat.id, text="Sorry, I didn't understand that command.")
 
-    # on noncommand i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.TEXT, echo))
 
-    # log all errors
-    application.add_error_handler(error)
 
-    # Start the Bot
+if __name__ == '__main__':
+
+    persistence = PicklePersistence(filepath="/workspaces/get_the_password_bot/persistent_data/data.pkl")
+    application = ApplicationBuilder().token('6087048986:AAFSoEq1zJefaTgVv3sgUK6jAFYZOCLSu0Y').persistence(persistence).build()
+    
+
+    start_handler = CommandHandler('start', start)
+    application.add_handler(start_handler)
+
+    echo_handler = MessageHandler(filters.TEXT & (~filters.COMMAND), echo)
+    application.add_handler(echo_handler)
+
+    caps_handler = CommandHandler('caps', caps)
+    application.add_handler(caps_handler)
+
+    inline_caps_handler = InlineQueryHandler(inline_caps)
+    application.add_handler(inline_caps_handler)
+
+    ncaps_handler = CommandHandler('ncaps', ncaps)
+    application.add_handler(ncaps_handler)
+
+    unknown_handler = MessageHandler(filters.COMMAND, unknown)
+    application.add_handler(unknown_handler)
+
     application.run_webhook(
         listen="0.0.0.0",
         port=int(PORT),
         url_path=TOKEN,
         webhook_url='https://telegram-bot-wedding.herokuapp.com/' + TOKEN
     )
-
-if __name__ == '__main__':
-    main()
