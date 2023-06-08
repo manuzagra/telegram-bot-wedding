@@ -47,7 +47,7 @@ def main():
     application.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(filters.text, echo))
+    application.add_handler(MessageHandler(filters.TEXT, echo))
 
     # log all errors
     application.add_error_handler(error)
