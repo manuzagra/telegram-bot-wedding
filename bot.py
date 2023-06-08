@@ -47,7 +47,7 @@ def main():
     application.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    application.add_handler(MessageHandler(Filters.text, echo))
+    application.add_handler(MessageHandler(filters.text, echo))
 
     # log all errors
     application.add_error_handler(error)
@@ -57,7 +57,7 @@ def main():
         listen="0.0.0.0",
         port=int(PORT),
         url_path=TOKEN,
-        webhook_url='https://telegram-bot-wedding.herokuapp.com/'
+        webhook_url='https://telegram-bot-wedding.herokuapp.com/' + TOKEN
     )
 
 if __name__ == '__main__':
